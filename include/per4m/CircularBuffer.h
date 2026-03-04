@@ -6,7 +6,7 @@
 
 #include <cstddef>
 
-namespace ffp {
+namespace per4m {
 
     /**
      * \brief A circular buffer class for storing double values.

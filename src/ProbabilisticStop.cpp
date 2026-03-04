@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <cctype>
 
-namespace ffp {
+namespace per4m {
     ProbabilisticStop::ProbabilisticStop(const double threshold, const double improve_pct, const Kernel kernel_type, const double lb, const int iterations,
                                          const int number_of_queries)
         : threshold_(threshold),

@@ -1,6 +1,6 @@
 #include <per4m/ProbabilisticFilter.h>
 
-namespace ffp {
+namespace per4m {
     ProbabilisticFilter::ProbabilisticFilter(const double threshold, const Kernel kernel_type, const int iterations, const int number_of_queries)
         : threshold_(threshold),
           estimator_type_(kernel_type),

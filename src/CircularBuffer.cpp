@@ -4,7 +4,7 @@
 
 #include <per4m/CircularBuffer.h>
 
-namespace ffp {
+namespace per4m {
     CircularBuffer::CircularBuffer(const size_type capacity) : capacity_(capacity), data_(new double[capacity]) {}
 
     CircularBuffer::~CircularBuffer() { delete[] data_; }

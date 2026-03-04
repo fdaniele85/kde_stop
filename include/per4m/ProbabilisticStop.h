@@ -7,7 +7,7 @@
 #include "KDE.h"
 #include <mutex>
 
-namespace ffp {
+namespace per4m {
     class ProbabilisticStop {
     public:
         /// Constructor

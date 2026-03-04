@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "KDE.h"
+#include <per4m/KDE.h>
 #include <mutex>
 
-namespace ffp {
+namespace per4m {
     class ProbabilisticFilter {
     public:
         /**

@@ -8,7 +8,7 @@
 #include <functional>
 #include <string_view>
 
-namespace ffp {
+namespace per4m {
     /**
      * @enum Kernel
      * @brief Enumeration of kernel types for KDE.
@@ -17,6 +17,12 @@ namespace ffp {
         gaussian,     ///< Gaussian kernel
         epanechnikov, ///< Epanechnikov kernel
         uniform       ///< Uniform kernel
+    };
+
+    enum class BandwidthType {
+        silverman, ///< Silverman's rule of thumb for bandwidth selection
+        isj,       ///< Improved Sheather & Jones method for bandwidth selection
+        scott      ///< Scott's rule of thumb for bandwidth selection
     };
 
     /**
@@ -42,7 +48,7 @@ namespace ffp {
         explicit KDE(Kernel kernel_type, int size, int n_queries, double lb = 0);
 
         /// @brief Destructor for KDE.
-        ~KDE();
+        ~KDE() = default;
 
         /**
          * @brief Feeds data to the KDE.
@@ -50,30 +56,32 @@ namespace ffp {
          */
         void feed_data(const CircularBuffer &data);
 
-        /// @brief Estimates the kernel density for given x values.
-        void kernelDensityEstimate() const;
-
         /**
          * @brief Estimates the cumulative distribution function (CDF) for a given x value.
          * @param x_value The x value for which the CDF is computed.
          * @return The CDF value.
          */
-        [[nodiscard]] double estimate(double x_value) const;
+        [[nodiscard]] double estimate(double x_value);
+
+        BandwidthType bandwith_type_ { BandwidthType::silverman }; ///< Type of bandwidth selection method used.
 
     private:
         double bandwidth_{0.5};                    ///< Bandwidth for the kernel.
         Kernel kernel_type_{Kernel::epanechnikov}; ///< Type of kernel used.
 
-        double *data_; ///< Data points for KDE.
+        std::vector<double> data_; ///< Data points for KDE.
         int size_;     ///< Size of the data.
 
-        double *x_values_; ///< X values for the KDE.
-        double *pdf_values_;  ///< Result of the KDE.
-        double *kernel_values_; ///< Kernel values for the KDE.
+        std::vector<double> x_values_; ///< X values for the KDE.
+        std::vector<double> pdf_values_;  ///< Result of the KDE.
+        std::vector<double> kernel_values_; ///< Kernel values for the KDE.
         int n_queries_;    ///< Number of queries.
 
         double lb_;                ///< Lower bound for the data.
 
         std::function<double(double, double)> kernel_function_{}; ///< Kernel function.
+
+        /// @brief Estimates the kernel density for given x values.
+        void kernelDensityEstimate();
     };
 } // namespace ffp
