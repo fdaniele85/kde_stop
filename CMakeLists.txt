@@ -39,7 +39,8 @@ add_library(per4m
 )
 
 if (PER4M_THREAD_SAFE)
-        target_compile_definitions(per4m PRIVATE PER4M_THREAD_SAFE)
+        message("Enabling thread-safe mode in per4m (mutex/lock_guard enabled)")
+        target_compile_definitions(per4m PUBLIC PER4M_THREAD_SAFE)
 endif()
 
 add_library(per4m::per4m ALIAS per4m)
