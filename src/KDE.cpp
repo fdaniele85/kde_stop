@@ -69,12 +69,12 @@ namespace per4m {
         if (bandwith_type_ == BandwidthType::silverman) {
             bandwidth_ = Bandwidth::silverman_1d(data_);
         } else {
-            std::vector<double> dati;
-            for (int i = 0; i < size_; ++i) {
-                data_[i] = data[i];
-                dati.push_back(data[i]);
+            try {
+                bandwidth_ = Bandwidth::isj_1d(data_);
+            } catch (const std::exception &e) {
+                std::cerr << "ISJ bandwidth selection failed: '" << e.what() << "'. Falling back to Silverman's rule." << std::endl;
+                bandwidth_ = Bandwidth::silverman_1d(data_);
             }
-            bandwidth_ = Bandwidth::isj_1d(dati);
         }
 #else
         bandwidth_ = Bandwidth::silverman_1d(data_);
