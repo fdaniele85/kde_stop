@@ -5,11 +5,8 @@
 #pragma once
 
 #include "KDE.h"
+#include <per4m/detail/Parallel.h>
 #include <limits>
-#ifdef PER4M_THREAD_SAFE
-#include <mutex>
-#endif
-
 
 namespace per4m {
     class ProbabilisticStop {
@@ -23,7 +20,8 @@ namespace per4m {
         /// \param iterations the probability is updated every iterations elements
         /// \param number_of_queries
         /// \param bandwith_type the method to be used for bandwidth selection in the KDE
-        ProbabilisticStop(double threshold, double improve_pct, Kernel kernel_type, double lb, int iterations, int number_of_queries, BandwidthType bandwith_type);
+        ProbabilisticStop(double threshold, double improve_pct, Kernel kernel_type, double lb, int iterations, int number_of_queries,
+                          BandwidthType bandwith_type);
 
         /**
          * \brief Checks if the stopping criterion is satisfied.
@@ -50,9 +48,7 @@ namespace per4m {
         double min_{std::numeric_limits<double>::max()}; ///< The minimum cost value observed.
 
         CircularBuffer data_; ///< Circular buffer to store the cost values.
-#ifdef PER4M_THREAD_SAFE
-        std::mutex mtx_;      ///< Mutex for thread-safe operations.
-#endif
+        detail::Mutex mtx_;   ///< Mutex for thread-safe operations.
         bool fed_{false};     ///< Flag indicating whether the data has been fed.
     };
-} // namespace ffp
+} // namespace per4m

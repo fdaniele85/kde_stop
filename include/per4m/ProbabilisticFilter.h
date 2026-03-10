@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <per4m/detail/Parallel.h>
 #include <per4m/KDE.h>
-#include <mutex>
 
 namespace per4m {
     class ProbabilisticFilter {
@@ -48,7 +48,7 @@ namespace per4m {
         int iterations_;        ///< The number of iterations for the filter process.
         KDE estimator_;         ///< The kernel density estimator used in the filter.
         CircularBuffer data_;   ///< The circular buffer for storing gap values.
-        std::mutex mtx_;        ///< Mutex for thread-safe operations.
+        detail::Mutex mtx_;        ///< Mutex for thread-safe operations.
         bool fed_{false};       ///< Flag indicating whether the filter has been fed with data.
     };
 } // namespace ffp

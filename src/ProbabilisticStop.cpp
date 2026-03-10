@@ -14,9 +14,7 @@ namespace per4m {
           data_(iterations) {}
 
     bool ProbabilisticStop::stop() {
-#ifdef PER4M_THREAD_SAFE
-        std::lock_guard<std::mutex> _(mtx_);
-#endif
+        detail::LockGuard _(mtx_);
 
         if (!fed_) {
             return false;
@@ -26,12 +24,8 @@ namespace per4m {
         return estimator_.estimate(target_val) < threshold_;
     }
 
-
     void ProbabilisticStop::add(double cost) {
-#ifdef PER4M_THREAD_SAFE
-        std::lock_guard<std::mutex> _(mtx_);
-#endif
-
+        detail::LockGuard _(mtx_);
 
         data_.add(cost);
         min_ = std::min(min_, cost);
@@ -40,4 +34,4 @@ namespace per4m {
             fed_ = true;
         }
     }
-} // namespace ffp
+} // namespace per4m

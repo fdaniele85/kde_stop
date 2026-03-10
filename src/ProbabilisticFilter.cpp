@@ -9,7 +9,7 @@ namespace per4m {
           data_(iterations) {}
 
     void ProbabilisticFilter::add(const double gap) {
-        std::lock_guard<std::mutex> _(mtx_);
+        detail::LockGuard _(mtx_);
 
         data_.add(gap);
 
