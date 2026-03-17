@@ -11,13 +11,13 @@ execute_process(
 # Use the git describe string for display, but keep a semver for CMake's version logic.
 set(PER4M_VERSION_STRING "${PER4M_GIT_DESCRIBE}")
 set(PER4M_VERSION_SEMVER "${PER4M_GIT_DESCRIBE}")
-if(PER4M_GIT_DESCRIBE)
-        set(PER4M_VERSION_STRING "${PER4M_GIT_DESCRIBE}")
-        string(REGEX MATCH "([0-9]+\\.[0-9]+\\.[0-9]+)" PER4M_VERSION_SEMVER "${PER4M_GIT_DESCRIBE}")
-        if(NOT PER4M_VERSION_SEMVER)
-                set(PER4M_VERSION_SEMVER "0.1.0")
-        endif()
-endif()
+if (PER4M_GIT_DESCRIBE)
+    set(PER4M_VERSION_STRING "${PER4M_GIT_DESCRIBE}")
+    string(REGEX MATCH "([0-9]+\\.[0-9]+\\.[0-9]+)" PER4M_VERSION_SEMVER "${PER4M_GIT_DESCRIBE}")
+    if (NOT PER4M_VERSION_SEMVER)
+        set(PER4M_VERSION_SEMVER "0.1.0")
+    endif ()
+endif ()
 
 project(per4m
         VERSION ${PER4M_VERSION_SEMVER}
@@ -29,18 +29,23 @@ include(CMakePackageConfigHelpers)
 
 option(PER4M_THREAD_SAFE "Enable thread-safe mode in per4m (mutex/lock_guard enabled)" OFF)
 
+set(PER4M_PUBLIC_HEADERS
+        include/per4m/Bandwidth.h
+        include/per4m/KDE.h
+        include/per4m/ProbabilisticStop.h
+)
+
 add_library(per4m
         src/ProbabilisticStop.cpp
         src/KDE.cpp
-#        src/ProbabilisticFilter.cpp
+        #        src/ProbabilisticFilter.cpp
         src/Bandwidth.cpp
-        src/Ribeiro.cpp
 )
 
 if (PER4M_THREAD_SAFE)
-        message("Enabling thread-safe mode in per4m (mutex/lock_guard enabled)")
-        target_compile_definitions(per4m PUBLIC PER4M_THREAD_SAFE)
-endif()
+    message("Enabling thread-safe mode in per4m (mutex/lock_guard enabled)")
+    target_compile_definitions(per4m PUBLIC PER4M_THREAD_SAFE)
+endif ()
 
 add_library(per4m::per4m ALIAS per4m)
 
@@ -51,12 +56,12 @@ add_library(per4m::per4m ALIAS per4m)
 #        target_link_libraries(per4m PUBLIC FFTW3::FFTW3)
 #        target_compile_definitions(per4m PUBLIC PER4M_USE_FFTW)
 #else()
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
 
-        message(STATUS "Found FFTW3 via pkg-config")
-        target_link_libraries(per4m PUBLIC PkgConfig::FFTW3)
-        target_compile_definitions(per4m PUBLIC PER4M_USE_FFTW)
+message(STATUS "Found FFTW3 via pkg-config")
+target_link_libraries(per4m PUBLIC PkgConfig::FFTW3)
+target_compile_definitions(per4m PUBLIC PER4M_USE_FFTW)
 #endif()
 
 target_compile_features(per4m PUBLIC cxx_std_20)
@@ -78,8 +83,12 @@ install(TARGETS per4m
         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(DIRECTORY include/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+install(FILES ${PER4M_PUBLIC_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/per4m
+)
+
+install(DIRECTORY include/per4m/detail/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/per4m/detail
 )
 
 # ---- Export targets ----
