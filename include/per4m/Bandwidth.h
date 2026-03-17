@@ -5,7 +5,6 @@
 namespace per4m {
 
     struct Bandwidth {
-        static double scott_1d(const std::vector<double>& x);
         static double silverman_1d(const std::vector<double>& x);
 
 #ifdef PER4M_USE_FFTW

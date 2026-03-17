@@ -41,8 +41,7 @@ namespace per4m {
             return (double)std::sqrt((double)acc);
         }
 
-        // percentile "linear" (stile type=7), su copia ordinata
-        double percentile_linear(std::vector<double> x, double q /*0..100*/) {
+        double percentile_linear(std::vector<double> x, double q) {
             if (x.empty())
                 return std::numeric_limits<double>::quiet_NaN();
             if (q <= 0) {
@@ -73,9 +72,6 @@ namespace per4m {
             return cnt;
         }
 
-        // ---------- KDEpy-like autogrid ----------
-        // Implementazione "molto fedele" come idea:
-        // boundary = max(boundary_abs, boundary_rel * range).
         std::vector<double> autogrid_1d(const std::vector<double> &data, double boundary_abs, double boundary_rel, std::size_t num_points) {
             if (data.empty())
                 throw std::invalid_argument("autogrid: empty data");
@@ -100,8 +96,6 @@ namespace per4m {
             return grid;
         }
 
-        // ---------- KDEpy-like linear_binning ----------
-        // Binning lineare su griglia equispaziata.
         std::vector<double> linear_binning_1d(const std::vector<double> &data, const std::vector<double> &xmesh, const std::vector<double> *weights) {
             const std::size_t n = xmesh.size();
             if (n < 2)
@@ -148,16 +142,12 @@ namespace per4m {
             return bins;
         }
 
-        // ---------- ISJ core: fixed point ----------
-
         long double fixed_point(long double t, long double N, const std::vector<long double> &I_sq, const std::vector<long double> &a2) {
-            // fedele al codice Python KDEpy
             const int ell = 7;
 
             const long double pi = acosl(-1.0L);
 
             auto sum_term = [&](int power_s, long double time) -> long double {
-                // (0.5) * pi^(2s) * sum( I_sq^s * a2 * exp(-I_sq*pi^2*time) )
                 long double acc = 0.0L;
                 const long double pi2 = pi * pi;
                 const long double coeff = 0.5L * powl(pi, (long double)(2 * power_s));
@@ -165,6 +155,7 @@ namespace per4m {
                     // I_sq already squared indices (1..n-1)^2, and stored as long double
                     const long double exp_arg = -I_sq[i] * pi2 * time;
                     const long double e = expl(exp_arg);
+
                     // I_sq^s
                     const long double isq_pow = powl(I_sq[i], (long double)power_s);
                     acc += isq_pow * a2[i] * e;
@@ -178,7 +169,6 @@ namespace per4m {
                 return -1.0L;
 
             for (int s = ell - 1; s >= 2; --s) {
-                // odd_numbers_prod = prod(1,3,5,...,2s-1,2s+1?) Python: np.arange(1,2*s+1,2)
                 long double odd_prod = 1.0L;
                 for (int k = 1; k < 2 * s + 1; k += 2)
                     odd_prod *= (long double)k;
@@ -192,7 +182,6 @@ namespace per4m {
                     return -1.0L;
             }
 
-            // t_opt = (2*N*sqrt(pi)*f)^(-2/5)
             const long double t_opt = powl(2.0L * N * sqrtl(pi) * f, -2.0L / 5.0L);
             return t - t_opt;
         }
@@ -222,7 +211,7 @@ namespace per4m {
                     return b;
                 }
 
-                if (!(fc == fc) || fabsl(fc) < 1e-14L) {
+                if (fabsl(fc) < 1e-14L) {
                     return b;
                 }
 
@@ -235,7 +224,6 @@ namespace per4m {
                     s = b - fb * (b - a) / (fb - fa);
                 }
 
-                long double tol_s = xtol + rtol * fabsl(b);
                 if ((s <= (3.0L * a + b) / 4.0L || s >= b) || (mflag && fabsl(s - b) >= fabsl(b - c) / 2.0L) ||
                     (!mflag && fabsl(s - b) >= fabsl(c - d) / 2.0L)) {
                     s = (a + b) / 2.0L;
@@ -266,11 +254,6 @@ namespace per4m {
             throw std::runtime_error("brentq: maximum iterations exceeded");
         }
 
-        // ---------- root finding (faithful strategy) ----------
-        // KDEpy usa brentq su [0, tol] e aumenta tol finché trova root.
-        // Qui facciamo: cerchiamo un intervallo [a,b] con cambio segno;
-        // poi bisection robusta (la brent vera si può aggiungere, ma così è già solidissimo).
-
         long double root_find_isj(std::size_t N_unique, const std::vector<long double> &I_sq, const std::vector<long double> &a2) {
             // clamp N come in KDEpy
             long double N = (long double)N_unique;
@@ -289,7 +272,6 @@ namespace per4m {
             long double a = 0.0L;
             long double fa = f(a);
 
-            // Trova intervallo [a,b] con cambio segno
             long double b = tol;
             long double fb = f(b);
 
@@ -306,8 +288,7 @@ namespace per4m {
                 }
             }
 
-            // Usa brentq su [a,b]
-            long double root = brentq(f, a, b, /*xtol=*/1e-12L, /*rtol=*/1e-10L, /*maxiter=*/100);
+            long double root = brentq(f, a, b, 1e-12L, 1e-10L, 100);
             std::cerr << "brentq found root: " << root << " after " << attempts << " attempts to bracket\n";
 
             if (!(root > 0.0L))
@@ -315,28 +296,17 @@ namespace per4m {
             return root;
         }
 
-        // ---------- IQR helpers ----------
         double robust_sigma_min_std_iqr(const std::vector<double> &x) {
             const double sd = sample_stddev(x);
             const double p75 = percentile_linear(x, 75.0);
             const double p25 = percentile_linear(x, 25.0);
-            // same constant as KDEpy comment: norm.ppf(.75)-norm.ppf(.25)=1.3489795003921634
+
             const double iqr_sigma = (p75 - p25) / 1.3489795003921634;
             return std::min(sd, iqr_sigma);
         }
 
     } // namespace
 
-    // ---------- public API ----------
-
-    double Bandwidth::scott_1d(const std::vector<double> &x) {
-        if (x.empty())
-            throw std::invalid_argument("scott_1d: empty data");
-        const double sigma = robust_sigma_min_std_iqr(x);
-        const double n = (double)x.size();
-        // dims=1 => n^(-1/(1+4)) = n^(-1/5)
-        return sigma * std::pow(n, -1.0 / 5.0);
-    }
 
     double Bandwidth::silverman_1d(const std::vector<double> &x) {
         if (x.empty())
@@ -351,7 +321,6 @@ namespace per4m {
             return sigma * std::pow((double)n * 3.0 / 4.0, -1.0 / 5.0);
         }
 
-        // fallback come KDEpy: usa percentile 99/1
         const double p99 = percentile_linear(x, 99.0);
         const double p01 = percentile_linear(x, 1.0);
         const double iqr2 = (p99 - p01) / 4.6526957480816815; // comment KDEpy
@@ -362,14 +331,10 @@ namespace per4m {
     }
 
 #ifdef PER4M_USE_FFTW
-    // ---------- FFTW DCT-II wrapper ----------
-    // SciPy fftpack.dct(x) default: type=2, norm=None (non normalizzata).
-    // FFTW: REDFT10 = DCT-II (non normalizzata) con convenzione compatibile.
     std::vector<double> dct_type2_fftw(const std::vector<double> &in) {
         const int n = (int)in.size();
         std::vector<double> out(n);
 
-        // FFTW richiede buffer mutabili
         std::vector<double> tmp_in = in;
 
         fftw_plan plan = fftw_plan_r2r_1d(n, tmp_in.data(), out.data(),
@@ -392,10 +357,8 @@ namespace per4m {
             throw std::invalid_argument("isj_1d: weights size mismatch");
         }
 
-        // KDEpy: n = 2**10
         const std::size_t n_grid = 1u << 10;
 
-        // Filtra weights<=0 (come KDEpy)
         std::vector<double> data;
         std::vector<double> wpos;
         data.reserve(x.size());
@@ -416,48 +379,38 @@ namespace per4m {
         if (data.empty())
             throw std::invalid_argument("isj_1d: no data after weight filtering");
 
-        // autogrid(data, boundary_abs=6, num_points=n, boundary_rel=0.5)
         const std::vector<double> xmesh = autogrid_1d(data, /*boundary_abs=*/6.0, /*boundary_rel=*/0.5, n_grid);
 
-        // R = max(data) - min(data)
         auto [mn_it, mx_it] = std::minmax_element(data.begin(), data.end());
         const double mn = *mn_it;
         const double mx = *mx_it;
         const double R = mx - mn;
         if (!(R > 0.0)) {
-            // dati costanti: ISJ non ha senso; fallback ragionevole
             return 1.0;
         }
 
-        // N = len(unique(data))  (KDEpy)
         const std::size_t N_unique = count_unique_exact(data);
         if (N_unique == 0)
             throw std::runtime_error("isj_1d: N_unique=0");
 
-        // linear_binning su griglia, normalizzato a somma 1
         const std::vector<double> initial_data = linear_binning_1d(data, xmesh, weights ? &wpos : nullptr);
 
-        // DCT-II
         const std::vector<double> a = dct_type2_fftw(initial_data);
 
-        // I_sq = (1..n-1)^2, FLOAT -> long double
         std::vector<long double> I_sq(n_grid - 1);
         for (std::size_t i = 0; i < n_grid - 1; ++i) {
             long double v = (long double)(i + 1);
             I_sq[i] = v * v;
         }
 
-        // a2 = a[1:]^2
         std::vector<long double> a2(n_grid - 1);
         for (std::size_t i = 0; i < n_grid - 1; ++i) {
             long double v = (long double)a[i + 1];
             a2[i] = v * v;
         }
 
-        // solve t_star
         const long double t_star = root_find_isj(N_unique, I_sq, a2);
 
-        // bandwidth = sqrt(t_star) * R
         const long double bw = sqrtl(t_star) * (long double)R;
         return (double)bw;
     }
