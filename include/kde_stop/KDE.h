@@ -8,7 +8,7 @@
 #include <functional>
 #include <string_view>
 
-namespace per4m {
+namespace kde_stop {
     /// @enum Kernel
     /// @brief Enumeration of kernel types for KDE.
     enum class Kernel {

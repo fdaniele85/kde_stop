@@ -1,9 +1,9 @@
-#include <per4m/ProbabilisticStop.h>
+#include <kde_stop/ProbabilisticStop.h>
 
 #include <algorithm>
 #include <cctype>
 
-namespace per4m {
+namespace kde_stop {
     ProbabilisticStop::ProbabilisticStop(const double threshold, const double improve_pct, const Kernel kernel_type, const double lb, const int iterations,
                                          const int number_of_queries, const BandwidthType bandwidth_type)
         : threshold_(threshold),

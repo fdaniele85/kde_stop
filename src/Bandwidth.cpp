@@ -1,4 +1,4 @@
-#include <per4m/Bandwidth.h>
+#include <kde_stop/Bandwidth.h>
 
 #include <algorithm>
 #include <cmath>
@@ -12,7 +12,7 @@
 
 #include <fftw3.h>
 
-namespace per4m {
+namespace kde_stop {
     namespace {
 
         // ---------- utilities (stats) ----------

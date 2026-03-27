@@ -6,7 +6,7 @@
 
 #include <cstddef>
 
-namespace per4m::detail {
+namespace kde_stop::detail {
 
     /// \brief A circular buffer class for storing double values.
     class CircularBuffer {

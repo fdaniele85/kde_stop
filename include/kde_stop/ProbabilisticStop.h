@@ -5,10 +5,10 @@
 #pragma once
 
 #include "KDE.h"
-#include <per4m/detail/Parallel.h>
+#include <kde_stop/detail/Parallel.h>
 #include <limits>
 
-namespace per4m {
+namespace kde_stop {
     class ProbabilisticStop {
     public:
         /// Constructor

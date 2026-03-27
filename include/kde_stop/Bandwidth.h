@@ -2,7 +2,7 @@
 #include <vector>
 #include <optional>
 
-namespace per4m {
+namespace kde_stop {
 
     /// \brief A utility class for bandwidth selection methods used in Kernel Density Estimation (KDE).
     struct Bandwidth {

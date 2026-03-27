@@ -4,11 +4,11 @@
 
 #include <cmath>
 #include <iostream>
-#include <per4m/Bandwidth.h>
-#include <per4m/KDE.h>
+#include <kde_stop/Bandwidth.h>
+#include <kde_stop/KDE.h>
 #include <stdexcept>
 
-namespace per4m {
+namespace kde_stop {
     bool icase_compare(const std::string_view s1, const std::string_view s2) {
         auto comparator = [](const char a, const char b) { return std::tolower(a) == std::tolower(b); };
 

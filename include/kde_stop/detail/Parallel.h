@@ -8,7 +8,7 @@
 #include <mutex>
 #endif
 
-namespace per4m::detail {
+namespace kde_stop::detail {
 #ifdef PER4M_THREAD_SAFE
     using Mutex = std::mutex;
     using LockGuard = std::lock_guard<std::mutex>;
