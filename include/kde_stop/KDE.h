@@ -19,7 +19,7 @@ namespace kde_stop {
 
     enum class BandwidthType {
         silverman, ///< Silverman's rule of thumb for bandwidth selection
-#ifdef PER4M_USE_FFTW
+#ifdef KDE_STOP_USE_FFTW
         isj ///< Improved Sheather & Jones method for bandwidth selection
 #endif
     };

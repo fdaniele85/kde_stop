@@ -11,7 +11,7 @@ namespace kde_stop {
         /// \return The computed bandwidth value based on Silverman's rule.
         static double silverman_1d(const std::vector<double>& x);
 
-#ifdef PER4M_USE_FFTW
+#ifdef KDE_STOP_USE_FFTW
         /// \brief Computes the bandwidth using the Improved Sheather & Jones method for 1D data.
         /// \param x A vector of data points for which the bandwidth is to be computed.
         /// \param weights An optional vector of weights corresponding to the data points. If not provided, equal weights are assumed.

@@ -330,7 +330,7 @@ namespace kde_stop {
         return 1.0;
     }
 
-#ifdef PER4M_USE_FFTW
+#ifdef KDE_STOP_USE_FFTW
     std::vector<double> dct_type2_fftw(const std::vector<double> &in) {
         const int n = (int)in.size();
         std::vector<double> out(n);
